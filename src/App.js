@@ -11,7 +11,7 @@ export default function Viewer() {
       <Environment preset="sunset"/>
           <Model />
       </Suspense>
-      <OrbitControls ref={ref} />
+      <OrbitControls ref={ref} enableZoom={false}/>
     </Canvas>
   )
 }
