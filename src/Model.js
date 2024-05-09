@@ -61,14 +61,24 @@ export function Model(props) {
   const badgeRef = useRef();
   const textRef = useRef();
   const [hovered, setHovered] = useState(false);
+  const [isRotating, setIsRotating] = useState(false);
 
-  // Function to toggle hover state
-  const handleHover = () => setHovered(!hovered);
+  const handleHover = (event) => {
+    // Calculate bounds based on the object's geometry
+    const bbox = new THREE.Box3().setFromObject(event.object);
+    const edgeThreshold = 0.1; // Adjust this threshold based on your needs
+    const { x, y } = event.intersections[0].point;
 
-  // useFrame to animate rotation
+    // Check if the hover is not on the edges
+    if (x > bbox.min.x + edgeThreshold && x < bbox.max.x - edgeThreshold &&
+        y > bbox.min.y + edgeThreshold && y < bbox.max.y - edgeThreshold) {
+        setHovered(!hovered);
+    } 
+
+  };
+
   useFrame(() => {
     if (badgeRef.current) {
-      // Rotate towards 180 degrees when hovered, and return to 0 otherwise
       const targetRotation = hovered ? Math.PI : 0;
       badgeRef.current.rotation.y +=
         (targetRotation - badgeRef.current.rotation.y) * 0.05;
@@ -91,7 +101,6 @@ export function Model(props) {
           rotation={[Math.PI / 2, 0, -Math.PI / 6]}
           scale={0.71}
           onPointerOver={handleHover}
-          onClick={handleHover}
         />
         <mesh
           castShadow
