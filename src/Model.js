@@ -1,6 +1,6 @@
 import React, { useRef, useState, useMemo } from "react";
 import { useGLTF, Text, Extrude } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame,useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 
 const RoundedPlane = ({
@@ -56,12 +56,21 @@ const RoundedPlane = ({
   );
 };
 
+
 export function Model(props) {
   const { nodes, materials } = useGLTF("/Badge_03.glb");
   const badgeRef = useRef();
   const textRef = useRef();
   const [hovered, setHovered] = useState(false);
-  const [isRotating, setIsRotating] = useState(false);
+  const backgroundRef = useRef()
+  const texture = useLoader(THREE.TextureLoader, '/background.png');
+
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: false,
+    opacity: 1,
+    depthTest: false
+  });
 
   const handleHover = (event) => {
     // Calculate bounds based on the object's geometry
@@ -77,9 +86,11 @@ export function Model(props) {
 
   };
 
+
   useFrame(() => {
     if (badgeRef.current) {
       const targetRotation = hovered ? Math.PI : 0;
+  
       badgeRef.current.rotation.y +=
         (targetRotation - badgeRef.current.rotation.y) * 0.05;
       textRef.current.rotation.y +=
@@ -101,7 +112,28 @@ export function Model(props) {
           rotation={[Math.PI / 2, 0, -Math.PI / 6]}
           scale={0.71}
           onPointerOver={handleHover}
+          renderOrder={1} 
         />
+            <mesh
+        position={[0, 0, -70.251]}
+        rotation={[Math.PI / 2, 0, Math.PI ]}
+        scale={0.8} 
+        material={material} 
+        renderOrder={0} 
+      >
+        <planeGeometry attach="geometry" args={[95, 120]} />
+      </mesh>
+      <mesh
+        position={[0, 0, -70.251]}
+        rotation={[Math.PI / 2, Math.PI , Math.PI ]}
+        scale={0.8}
+        ref={backgroundRef}
+        material={material} 
+        renderOrder={0} 
+
+      >
+        <planeGeometry attach="geometry" args={[95, 120]} />
+      </mesh>
         <mesh
           castShadow
           receiveShadow
